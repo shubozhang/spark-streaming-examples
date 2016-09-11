@@ -1,4 +1,4 @@
-package com.sparkstreaming.p04filtertweets
+package com.sparkstreaming.p03filtertweets
 
 import org.apache.spark._
 import org.apache.spark.SparkContext._

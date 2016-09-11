@@ -1,4 +1,4 @@
-package com.sparkstreaming.p02wordcount
+package com.sparkstreaming.p01wordcount
 
 import org.apache.spark._
 

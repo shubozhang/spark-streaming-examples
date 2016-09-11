@@ -1,4 +1,4 @@
-package com.sparkstreaming.p01livetweets
+package com.sparkstreaming.p02readandsavetweets
 
 import org.apache.spark._
 import org.apache.spark.SparkContext._

@@ -1,4 +1,4 @@
-package com.sparkstreaming.p04filtertweets
+package com.sparkstreaming.p03filtertweets
 
 import org.apache.spark._
 import org.apache.spark.SparkContext._
@@ -9,8 +9,12 @@ import java.util.concurrent._
 import java.util.concurrent.atomic._
 import com.sparkstreaming.utils.Utilities._
 
-object LongestTweetLength {
-   /** Our main function where the action happens */
+/** Uses thread-safe counters to keep track of the average length of
+ *  Tweets in a stream.
+ */
+object AverageTweetLength {
+  
+  /** Our main function where the action happens */
   def main(args: Array[String]) {
 
     // Configure Twitter credentials using twitter.txt
@@ -32,22 +36,28 @@ object LongestTweetLength {
     // Map this to tweet character lengths.
     val lengths = statuses.map(status => status.length())
     
-    lengths.print()
+    // As we could have multiple processes adding into these running totals
+    // at the same time, we'll just Java's AtomicLong class to make sure
+    // these counters are thread-safe.
+    var totalTweets = new AtomicLong(0)
+    var totalChars = new AtomicLong(0)
     
-    var maxLength = new AtomicInteger(0)
-
+    // In Spark 1.6+, you  might also look into the mapWithState function, which allows
+    // you to safely and efficiently keep track of global state with key/value pairs.
+    // We'll do that later in the course.
     
     lengths.foreachRDD((rdd, time) => {
       
-      var max = rdd.max()
       var count = rdd.count()
       if (count > 0) {
-        if (max > maxLength.get()) {
-           maxLength.set(max)
-      } 
+        totalTweets.getAndAdd(count)
+        
+        totalChars.getAndAdd(rdd.reduce((x,y) => x + y))
+        
+        println("Total tweets: " + totalTweets.get() + 
+            " Total characters: " + totalChars.get() + 
+            " Average: " + totalChars.get() / totalTweets.get())
       }
-      
-      println(maxLength)
     })
     
     // Set a checkpoint directory, and kick it all off
