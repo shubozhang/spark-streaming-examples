@@ -18,7 +18,7 @@ object LongestTweetLength {
     
     // Set up a Spark streaming context named "AverageTweetLength" that runs locally using
     // all CPU cores and one-second batches of data
-    val ssc = new StreamingContext("local[*]", "AverageTweetLength", Seconds(1))
+    val ssc = new StreamingContext("local[*]", "AverageTweetLength", Seconds(5))
     
     // Get rid of log spam (should be called after the context is set up)
     setupLogging()
